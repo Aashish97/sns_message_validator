@@ -1,3 +1,7 @@
+import requests
+
+from rest_framework.exceptions import ValidationError
+
 from exceptions import (
     InvalidMessageTypeException, 
     InvalidCertURLException, 
@@ -8,6 +12,8 @@ from sns_message_verifier import SNSMessageVerifier
 
 
 sns_message_validator = SNSMessageVerifier()
+
+ALLOWED_TOPIC_ARN = "topic_arn_here"
 
 
 class SNSMessageProcessor:
@@ -34,9 +40,8 @@ class SNSMessageProcessor:
     def validate_topic_arn(self):
         """Validate that the SNS message comes from an expected TopicArn."""
         topic_arn = self.message.get("TopicArn")
-        allowed_topic_arn = settings.SCHEDULE_SIGNUP_EMAIL_TOPIC_ARN
 
-        if not topic_arn or topic_arn != allowed_topic_arn:
+        if not topic_arn or topic_arn != ALLOWED_TOPIC_ARN:
             raise ValidationError({
                 "error": f"Unauthorized SNS topic: {topic_arn}."
             })
